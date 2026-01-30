@@ -5,11 +5,27 @@ const tabSchema = new Schema<ITab>(
   {
     title: {
       type: String,
-      requried: true,
+      required: true,
       trim: true,
     },
-    userId: { type: Schema.Types.ObjectId, ref: "Auth" },
-    content: [],
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "Auth",
+      required: true,
+    },
+    content: [
+      {
+        role: {
+          type: String,
+          enum: ["user", "model"],
+          required: true,
+        },
+        text: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
   },
   { timestamps: true },
 );

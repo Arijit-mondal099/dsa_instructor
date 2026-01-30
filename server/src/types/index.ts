@@ -4,7 +4,6 @@ export interface IAuth extends Document {
   username: string;
   email: string;
   password: string;
-  chatHistory: ObjectId[];
   refreshToken?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -16,8 +15,8 @@ export interface IAuth extends Document {
 
 export interface ITab extends Document {
   title: string;
-  userId: ObjectId;
-  content: [{ role: "user" | "model"; text: string }];
+  userId: Types.ObjectId;
+  content: { role: "user" | "model"; text: string; }[];
   createdAt: Date;
   updatedAt: Date;
 }

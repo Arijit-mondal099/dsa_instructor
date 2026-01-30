@@ -1,4 +1,4 @@
-import { ObjectId, Document } from "mongoose";
+import { ObjectId, Document, Types } from "mongoose";
 
 export interface IAuth extends Document {
   username: string;
@@ -8,6 +8,10 @@ export interface IAuth extends Document {
   refreshToken?: string;
   createdAt: Date;
   updatedAt: Date;
+
+  comparePassword(plain: string): Promise<boolean>;
+  generateAccessToken(): string;
+  generateRefreshToken(): string;
 }
 
 export interface ITab extends Document {
@@ -16,4 +20,10 @@ export interface ITab extends Document {
   content: [{ role: "user" | "model"; text: string }];
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface IUser {
+  id: Types.ObjectId;
+  username: string;
+  email: string;
 }

@@ -26,7 +26,6 @@ const authSchema = new Schema<IAuth>(
       required: true,
       trim: true,
     },
-    chatHistory: [{ type: Schema.Types.ObjectId, ref: "Tab" }],
     refreshToken: String,
   },
   { timestamps: true },

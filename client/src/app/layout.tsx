@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
-import { Sidebar } from "@/components/Sidebar";
+import { AppContextProvider } from "@/context/AppContext";
+import AuthGuard from "@/components/AuthGuard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,27 +25,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}
       >
-        <header className="w-full shadow border-b border-gray-800">
-          <Navbar />
-        </header>
-
-        <main className="flex-1 grid grid-cols-12">
-          <aside className="col-span-2 border-r border-gray-800 shadow">
-            <Sidebar />
-          </aside>
-
-          <div className="col-span-10 bg-zinc-900 w-full">
+        <AppContextProvider>
+          <AuthGuard>
             {children}
-          </div>
-        </main>
-
-        <footer className="w-full border-t border-gray-800 shadow">
-          <Footer />
-        </footer>
+          </AuthGuard>
+        </AppContextProvider>
       </body>
     </html>
   );

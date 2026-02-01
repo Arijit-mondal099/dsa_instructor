@@ -2,7 +2,7 @@
 
 import { useAppContext } from "@/context/AppContext";
 import Image from "next/image";
-import { use, useEffect } from "react";
+import { use, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
@@ -17,10 +17,15 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({
 }) => {
   const { slug } = use(params);
   const { fetchMessageTabContent, selectTabContent } = useAppContext();
+  const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     fetchMessageTabContent(slug);
   }, [slug, fetchMessageTabContent]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [selectTabContent]);
 
   return selectTabContent.length ? (
     <div className="flex flex-col gap-6 max-w-3xl mx-auto w-full pb-6">
@@ -133,6 +138,8 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({
           </div>
         ),
       )}
+
+      <div ref={bottomRef} />
     </div>
   ) : (
     <div className="flex flex-col items-center justify-center h-full max-w-3xl mx-auto px-6">

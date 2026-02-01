@@ -5,6 +5,7 @@ import { ApiResponse } from "../utils/api_response";
 import { asyncHandler } from "../utils/async_handler";
 import { generateAccessAndRefreshToken } from "../utils/generate_token";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import type { CookieOptions } from "express";
 
 export const register = asyncHandler(async (req, res) => {
   const { email, password, username } = req.body as {
@@ -18,7 +19,7 @@ export const register = asyncHandler(async (req, res) => {
   }
 
   if (password.length < 6) {
-    throw new ApiError(400, "Password length should be getterthan 6 charaters")
+    throw new ApiError(400, "Password length should be getterthan 6 charaters");
   }
 
   const is_user_exist = await AuthModel.findOne({
@@ -77,6 +78,14 @@ export const login = asyncHandler(async (req, res) => {
     user._id,
   );
 
+  const cookieOptions: CookieOptions = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 7,
+  };
+
   const data = {
     _id: user._id,
     email: user.email,
@@ -86,6 +95,8 @@ export const login = asyncHandler(async (req, res) => {
   };
 
   return res
+    .cookie("accessToken", accessToken, cookieOptions)
+    .cookie("refreshToken", refreshToken, cookieOptions)
     .status(200)
     .json(new ApiResponse(200, "User loggedin successfuly", data));
 });

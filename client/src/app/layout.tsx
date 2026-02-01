@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AppContextProvider } from "@/context/AppContext";
 import AuthGuard from "@/components/AuthGuard";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({
         <AppContextProvider>
           <AuthGuard>
             {children}
+            <Toaster />
           </AuthGuard>
         </AppContextProvider>
       </body>

@@ -6,12 +6,16 @@ import { useAppContext } from "@/context/AppContext";
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { accessToken } = useAppContext();
+  const { accessToken, messageTabs, getUserTabs } = useAppContext();
 
   useEffect(() => {
+    getUserTabs();
+  }, []);
+
+  useEffect(() => {
+    if (messageTabs.length > 0) router.replace(`/chat/${messageTabs[0]._id}`);
     if (!accessToken) router.replace("/login");
-    else router.replace("/chat/1");
-  }, [router, accessToken]);
+  }, [router, accessToken, messageTabs]);
 
   return children;
 }

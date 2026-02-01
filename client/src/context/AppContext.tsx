@@ -1,27 +1,183 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
-
-interface IAppContext {
-  user: string | null;
-  accessToken: string | null;
-  refreshToken: string | null;
-  sidebarOpen: boolean;
-  login: (name: string) => void;
-  logout: () => void;
-  toggleSidebar: () => void;
-}
+import { axiosInstance } from "@/lib/axios";
+import {
+  IAppContext,
+  IContent,
+  ILoginResponse,
+  ILogoutResponse,
+  IMessageContentResponse,
+  IMessageTabResponse,
+  IRegisterResponse,
+  ITab,
+} from "@/type";
+import { AxiosError } from "axios";
+import { createContext, useCallback, useContext, useState } from "react";
+import { toast } from "sonner";
 
 const AuthContext = createContext<IAppContext | undefined>(undefined);
 
-export function AppContextProvider({ children }: { children: React.ReactNode }) {
+export function AppContextProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [user, setUser] = useState<string | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>("sjsisiwiiw");
-  const [refreshToken, setRefreshToken] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(() =>
+    typeof window !== "undefined" ? localStorage.getItem("accessToken") : null,
+  );
+  const [refreshToken, setRefreshToken] = useState<string | null>(() =>
+    typeof window !== "undefined" ? localStorage.getItem("refreshToken") : null,
+  );
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+  const [messageTabs, setMessageTabs] = useState<ITab[]>([]);
+  const [selectTabContent, setSelectTabContent] = useState<IContent[]>([]);
 
-  const login = (name: string) => setUser(name);
-  const logout = () => setUser(null);
+  const login = useCallback(
+    async (payload: { email: string; password: string }): Promise<void> => {
+      try {
+        const { data } = await axiosInstance.post<ILoginResponse>(
+          "/auth/login",
+          payload,
+        );
+
+        if (data.success) {
+          setAccessToken(data.data.accessToken);
+          setRefreshToken(data.data.refreshToken);
+          setUser(data.data.username);
+          localStorage.setItem("accessToken", data.data.accessToken);
+          localStorage.setItem("refreshToken", data.data.refreshToken);
+          toast.success(data.message);
+        }
+      } catch (error: unknown) {
+        if (error instanceof AxiosError) {
+          toast.error(error.response?.data?.message || "Login failed");
+        } else if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("Something went wrong");
+        }
+      }
+    },
+    [],
+  );
+
+  const register = useCallback(
+    async (payload: {
+      username: string;
+      email: string;
+      password: string;
+    }): Promise<void> => {
+      try {
+        const { data } = await axiosInstance.post<IRegisterResponse>(
+          "/auth/register",
+          payload,
+        );
+        if (data.success) {
+          toast.success(data.message);
+        }
+      } catch (error: unknown) {
+        if (error instanceof AxiosError) {
+          toast.error(error.response?.data?.message || "Register failed");
+        } else if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("Something went wrong");
+        }
+      }
+    },
+    [],
+  );
+
+  const logout = useCallback(
+    async (): Promise<void> => {
+      try {
+        const { data } = await axiosInstance.post<ILogoutResponse>(
+          "/auth/logout",
+          null,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          },
+        );
+        if (data.success) {
+          setAccessToken(null);
+          setRefreshToken(null);
+          setUser(null);
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+        }
+      } catch (error: unknown) {
+        if (error instanceof AxiosError) {
+          toast.error(error.response?.data?.message || "Logout failed");
+        } else if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("Something went wrong");
+        }
+      }
+    }, 
+    [accessToken]
+  );
+
+  const getUserTabs = useCallback(
+    async (): Promise<void> => {
+      try {
+        const { data } = await axiosInstance.get<IMessageTabResponse>(
+          "/message",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          },
+        );
+        if (data.success) {
+          setMessageTabs(data.data.tabs);
+        }
+      } catch (error: unknown) {
+        if (error instanceof AxiosError) {
+          toast.error(error.response?.data?.message || "Failed fetch tabs");
+        } else if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("Something went wrong");
+        }
+      }
+    }, 
+    [accessToken]
+  );
+
+  const fetchMessageTabContent = useCallback(
+    async (slug: string): Promise<void> => {
+      try {
+        const { data } = await axiosInstance.get<IMessageContentResponse>(
+          `/message/${slug}`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          },
+        );
+
+        if (data.success) {
+          setSelectTabContent(data.data.content);
+        }
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          toast.error(
+            error.response?.data?.message || "Failed fetch tab content",
+          );
+        } else if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("Something went wrong");
+        }
+      }
+    },
+    [accessToken],
+  );
+
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   return (
@@ -31,9 +187,14 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
         accessToken,
         refreshToken,
         sidebarOpen,
+        messageTabs,
+        selectTabContent,
+        fetchMessageTabContent,
         toggleSidebar,
         login,
+        register,
         logout,
+        getUserTabs,
       }}
     >
       {children}

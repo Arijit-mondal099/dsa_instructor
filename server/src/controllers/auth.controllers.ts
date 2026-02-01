@@ -33,7 +33,6 @@ export const register = asyncHandler(async (req, res) => {
     username,
     email,
     password,
-    chatHistory: [],
   });
 
   const is_new_user_created = await AuthModel.findById(new_user._id).select(

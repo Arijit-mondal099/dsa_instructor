@@ -10,7 +10,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     getUserTabs();
-  }, []);
+  }, [getUserTabs]);
 
   useEffect(() => {
     if (messageTabs.length > 0) router.replace(`/chat/${messageTabs[0]._id}`);

@@ -5,6 +5,8 @@ export interface IAppContext {
   sidebarOpen: boolean;
   messageTabs: ITab[];
   selectTabContent: IContent[];
+  activeTab: string | null, 
+  setActiveTab: React.Dispatch<React.SetStateAction<string | null>>;
   login: (payload: { email: string; password: string }) => Promise<void>;
   register: (payload: {
     username: string;
@@ -14,6 +16,7 @@ export interface IAppContext {
   logout: () => Promise<void>;
   getUserTabs: () => Promise<void>;
   fetchMessageTabContent: (slug: string) => Promise<void>;
+  createNewChatTab: () => Promise<void>;
   toggleSidebar: () => void;
 }
 
@@ -83,5 +86,21 @@ export interface IMessageContentResponse {
     title: string;
     userId: string;
     content: IContent[];
+  };
+}
+
+export interface INewChatTabCreateResponse {
+  status: number;
+  success: boolean;
+  message: string;
+  data: {
+    tab: {
+      title: string;
+      userId: string;
+      content: [];
+      _id: string;
+      createdAt: Date;
+      updatedAt: Date;
+    };
   };
 }

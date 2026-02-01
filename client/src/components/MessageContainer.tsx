@@ -22,7 +22,7 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({
     fetchMessageTabContent(slug);
   }, [slug, fetchMessageTabContent]);
 
-  return (
+  return selectTabContent.length ? (
     <div className="flex flex-col gap-6 max-w-3xl mx-auto w-full pb-6">
       {selectTabContent.map((msg) =>
         msg.role === "user" ? (
@@ -133,6 +133,88 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({
           </div>
         ),
       )}
+    </div>
+  ) : (
+    <div className="flex flex-col items-center justify-center h-full max-w-3xl mx-auto px-6">
+      <div className="flex flex-col items-center gap-6 text-center">
+        {/* AI Avatar */}
+        <div className="w-20 h-20 rounded-full overflow-hidden ring-4 ring-zinc-700/50">
+          <Image
+            src="/ai_image.jpg"
+            className="w-full h-full object-cover"
+            alt="ai-image"
+            width={80}
+            height={80}
+          />
+        </div>
+
+        {/* Welcome Message */}
+        <div className="space-y-3">
+          <h2 className="text-3xl font-bold text-white">
+            How can I help you with DSA today?
+          </h2>
+          <p className="text-zinc-400 text-lg">
+            Ask me anything about Data Structures and Algorithms
+          </p>
+        </div>
+
+        {/* Suggestion Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-6 w-full max-w-2xl">
+          <button className="group p-4 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-left transition-all duration-200 border border-zinc-700 hover:border-zinc-600">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">🎯</span>
+              <div>
+                <h3 className="font-semibold text-white mb-1">
+                  Explain a concept
+                </h3>
+                <p className="text-sm text-zinc-400">
+                  Learn about sorting, trees, graphs, and more
+                </p>
+              </div>
+            </div>
+          </button>
+
+          <button className="group p-4 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-left transition-all duration-200 border border-zinc-700 hover:border-zinc-600">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">💡</span>
+              <div>
+                <h3 className="font-semibold text-white mb-1">
+                  Solve a problem
+                </h3>
+                <p className="text-sm text-zinc-400">
+                  Get help with coding challenges and solutions
+                </p>
+              </div>
+            </div>
+          </button>
+
+          <button className="group p-4 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-left transition-all duration-200 border border-zinc-700 hover:border-zinc-600">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">📊</span>
+              <div>
+                <h3 className="font-semibold text-white mb-1">
+                  Analyze complexity
+                </h3>
+                <p className="text-sm text-zinc-400">
+                  Understand time and space complexity
+                </p>
+              </div>
+            </div>
+          </button>
+
+          <button className="group p-4 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-left transition-all duration-200 border border-zinc-700 hover:border-zinc-600">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">🚀</span>
+              <div>
+                <h3 className="font-semibold text-white mb-1">Optimize code</h3>
+                <p className="text-sm text-zinc-400">
+                  Improve your algorithm efficiency
+                </p>
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

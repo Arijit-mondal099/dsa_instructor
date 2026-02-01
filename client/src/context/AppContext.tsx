@@ -8,10 +8,12 @@ import {
   ILogoutResponse,
   IMessageContentResponse,
   IMessageTabResponse,
+  INewChatTabCreateResponse,
   IRegisterResponse,
   ITab,
 } from "@/type";
 import { AxiosError } from "axios";
+import { useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useState } from "react";
 import { toast } from "sonner";
 
@@ -32,6 +34,8 @@ export function AppContextProvider({
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [messageTabs, setMessageTabs] = useState<ITab[]>([]);
   const [selectTabContent, setSelectTabContent] = useState<IContent[]>([]);
+  const [activeTab, setActiveTab] = useState<string | null>(null);
+  const router = useRouter();
 
   const login = useCallback(
     async (payload: { email: string; password: string }): Promise<void> => {
@@ -134,6 +138,7 @@ export function AppContextProvider({
         );
         if (data.success) {
           setMessageTabs(data.data.tabs);
+          setActiveTab(data.data.tabs[0]._id);
         }
       } catch (error: unknown) {
         if (error instanceof AxiosError) {
@@ -178,6 +183,39 @@ export function AppContextProvider({
     [accessToken],
   );
 
+  const createNewChatTab = useCallback(
+    async () => {
+      try {
+        const { data } = await axiosInstance.post<INewChatTabCreateResponse>(
+          "/message", 
+          null,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`
+            }
+          }
+        );
+
+        if (data.success) {
+          setMessageTabs((prev) => [data.data.tab, ...prev]);
+          setActiveTab(data.data.tab._id);
+          router.push(`/chat/${data.data.tab._id}`);
+        }
+      } catch (error: unknown) {
+        if (error instanceof AxiosError) {
+          toast.error(
+            error.response?.data?.message || "Failed fetch tab content",
+          );
+        } else if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("Something went wrong");
+        }
+      }
+    },
+    [accessToken, router]
+  )
+
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   return (
@@ -189,12 +227,15 @@ export function AppContextProvider({
         sidebarOpen,
         messageTabs,
         selectTabContent,
+        activeTab, 
+        setActiveTab,
         fetchMessageTabContent,
         toggleSidebar,
         login,
         register,
         logout,
         getUserTabs,
+        createNewChatTab
       }}
     >
       {children}

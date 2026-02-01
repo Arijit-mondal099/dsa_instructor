@@ -3,17 +3,20 @@
 import { useAppContext } from "@/context/AppContext";
 import { LogOut, MessageSquare, PanelRightOpen, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export const Sidebar = () => {
-  const { sidebarOpen, toggleSidebar, logout, getUserTabs, messageTabs } =
-    useAppContext();
+  const { sidebarOpen, toggleSidebar, logout, getUserTabs, messageTabs, createNewChatTab, selectTabContent, activeTab, setActiveTab } = useAppContext();
   const router = useRouter();
 
-  // Initialize activeTab based on messageTabs directly
-  const [activeTab, setActiveTab] = useState<string | null>(
-    messageTabs.length ? messageTabs[0]._id : null,
-  );
+  const handleCreateNewTab = () => {
+    if (selectTabContent.length && messageTabs[0].content.length) {
+      createNewChatTab();
+    } else {
+      router.push(`/chat/${messageTabs[0]._id}`);
+      setActiveTab(messageTabs[0]._id)
+    }
+  }
 
   useEffect(() => {
     getUserTabs();
@@ -21,7 +24,7 @@ export const Sidebar = () => {
 
   useEffect(() => {
     if (messageTabs.length && !activeTab) setActiveTab(messageTabs[0]._id);
-  }, [messageTabs, activeTab]);
+  }, [messageTabs, activeTab, setActiveTab]);
 
   return (
     <aside
@@ -35,7 +38,10 @@ export const Sidebar = () => {
       </div>
 
       <div className="p-2 border-b border-zinc-800">
-        <button className="flex items-center justify-center gap-2 bg-zinc-800 w-full py-2.5 rounded-lg hover:bg-zinc-700 transition cursor-pointer">
+        <button 
+          className="flex items-center justify-center gap-2 bg-zinc-800 w-full py-2.5 rounded-lg hover:bg-zinc-700 transition cursor-pointer"
+          onClick={handleCreateNewTab}
+        >
           <Plus className="w-5 h-5" />
           <span className="text-sm font-semibold">New Chat</span>
         </button>

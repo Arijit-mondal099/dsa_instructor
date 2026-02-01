@@ -1,21 +1,45 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAppContext } from "@/context/AppContext";
 
-export default function AuthGuard({ children }: { children: React.ReactNode }) {
+export default function AuthGuard({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const router = useRouter();
+  const pathname = usePathname();
+
   const { accessToken, messageTabs, getUserTabs } = useAppContext();
 
   useEffect(() => {
-    getUserTabs();
-  }, [getUserTabs]);
+    if (accessToken) {
+      getUserTabs();
+    }
+  }, [accessToken, getUserTabs]);
 
   useEffect(() => {
-    if (messageTabs.length > 0) router.replace(`/chat/${messageTabs[0]._id}`);
-    if (!accessToken) router.replace("/login");
-  }, [router, accessToken, messageTabs]);
+    const isAuthRoute =
+      pathname === "/login" || pathname === "/register";
+    const isChatRoute = pathname.startsWith("/chat");
+
+    if (!accessToken) {
+      if (isChatRoute) {
+        router.replace("/login");
+      }
+      return;
+    }
+
+    if (accessToken) {
+      if (isAuthRoute) {
+        if (messageTabs.length > 0) {
+          router.replace(`/chat/${messageTabs[0]._id}`);
+        }
+      }
+    }
+  }, [accessToken, pathname, router, messageTabs]);
 
   return children;
 }

@@ -39,6 +39,36 @@ export function AppContextProvider({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
 
+  const createNewChatTab = useCallback(async () => {
+    try {
+      const { data } = await axiosInstance.post<INewChatTabCreateResponse>(
+        "/message",
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      if (data.success) {
+        setMessageTabs((prev) => [data.data.tab, ...prev]);
+        setActiveTab(data.data.tab._id);
+        router.push(`/chat/${data.data.tab._id}`);
+      }
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(
+          error.response?.data?.message || "Failed fetch tab content",
+        );
+      } else if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Something went wrong");
+      }
+    }
+  }, [accessToken, router]);
+
   const login = useCallback(
     async (payload: { email: string; password: string }): Promise<void> => {
       try {
@@ -46,6 +76,10 @@ export function AppContextProvider({
           "/auth/login",
           payload,
         );
+
+        if (messageTabs.length === 0) {
+          createNewChatTab();
+        }
 
         if (data.success) {
           setAccessToken(data.data.accessToken);
@@ -65,7 +99,7 @@ export function AppContextProvider({
         }
       }
     },
-    [],
+    [createNewChatTab, messageTabs],
   );
 
   const register = useCallback(
@@ -179,36 +213,6 @@ export function AppContextProvider({
     [accessToken],
   );
 
-  const createNewChatTab = useCallback(async () => {
-    try {
-      const { data } = await axiosInstance.post<INewChatTabCreateResponse>(
-        "/message",
-        null,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      );
-
-      if (data.success) {
-        setMessageTabs((prev) => [data.data.tab, ...prev]);
-        setActiveTab(data.data.tab._id);
-        router.push(`/chat/${data.data.tab._id}`);
-      }
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        toast.error(
-          error.response?.data?.message || "Failed fetch tab content",
-        );
-      } else if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error("Something went wrong");
-      }
-    }
-  }, [accessToken, router]);
-
   const sentMessageToAI = useCallback(
     async (prompt: string) => {
       setIsLoading(true);
@@ -230,7 +234,10 @@ export function AppContextProvider({
 
         if (data.success) {
           setIsLoading(false);
-          setSelectTabContent((prev) => [...prev, { _id: Date.now().toString(), ...data.data}]);
+          setSelectTabContent((prev) => [
+            ...prev,
+            { _id: Date.now().toString(), ...data.data },
+          ]);
         }
       } catch (error: unknown) {
         if (error instanceof AxiosError) {

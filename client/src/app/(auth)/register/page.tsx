@@ -1,7 +1,9 @@
 "use client";
 
+import { useAppContext } from "@/context/AppContext";
 import { Eye, EyeOff, LoaderIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const RegisterPage = () => {
@@ -10,14 +12,15 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { register } = useAppContext();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
-    // Add your authentication logic here
     try {
-      // Example: await signIn(email, password);
+      await register({ username, email, password });
+      router.push("/login");
       console.log("Login attempt:", { email, password });
     } catch (error) {
       console.error("Login error:", error);
@@ -138,8 +141,7 @@ const RegisterPage = () => {
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-600"></div>
               </div>
-              <div className="relative flex justify-center text-sm">
-              </div>
+              <div className="relative flex justify-center text-sm"></div>
             </div>
           </form>
 

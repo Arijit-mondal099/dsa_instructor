@@ -28,7 +28,7 @@ export const Sidebar = () => {
 
   return (
     <aside
-      className={`fixed z-50 transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} transition lg:translate-0 lg:static lg:col-span-2 border-r border-gray-800 shadow overflow-y-auto h-full flex flex-col bg-zinc-900 text-white`}
+      className={`fixed z-50 transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} transition w-64 lg:w-full lg:translate-0 lg:static lg:col-span-2 border-r border-gray-800 shadow overflow-y-auto h-full flex flex-col bg-zinc-900 text-white`}
     >
       <div className="p-4 border-b border-zinc-800 flex items-center justify-between gap-4">
         <h1 className="text-xl font-bold ">DSA Agent</h1>

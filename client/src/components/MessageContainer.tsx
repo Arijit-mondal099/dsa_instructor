@@ -32,29 +32,16 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({
     <div className="flex flex-col gap-6 max-w-3xl mx-auto w-full pb-6">
       {selectTabContent.map((msg) =>
         msg.role === "user" ? (
-          <div className="flex gap-4 justify-end" key={msg._id}>
+          <div className="flex justify-end" key={msg._id}>
             <div className="flex flex-col items-end gap-2 max-w-[80%]">
               <p className="py-3 px-4 rounded-3xl bg-zinc-700 text-white whitespace-pre-wrap">
                 {msg.text}
               </p>
             </div>
-            <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-semibold shrink-0">
-              U
-            </div>
           </div>
         ) : (
-          <div className="flex gap-4" key={msg._id}>
-            <div className="w-8 h-8 rounded-full shrink-0 overflow-hidden">
-              <Image
-                src="/ai_image.jpg"
-                className="w-full h-full object-cover"
-                alt="ai-image"
-                width={100}
-                height={100}
-              />
-            </div>
-
-            <div className="flex flex-col gap-2 max-w-[80%]">
+          <div className="flex" key={msg._id}>
+            <div className="flex flex-col gap-2 w-full">
               <div className="py-3 px-4 rounded-3xl bg-zinc-800 text-gray-100 prose prose-invert prose-sm max-w-none">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
@@ -182,7 +169,6 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({
   ) : (
     <div className="flex flex-col items-center justify-center h-full max-w-3xl mx-auto px-6">
       <div className="flex flex-col items-center gap-6 text-center">
-        {/* AI Avatar */}
         <div className="w-20 h-20 rounded-full overflow-hidden ring-4 ring-zinc-700/50">
           <Image
             src="/ai_image.jpg"
@@ -193,7 +179,6 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({
           />
         </div>
 
-        {/* Welcome Message */}
         <div className="space-y-3">
           <h2 className="text-3xl font-bold text-white">
             How can I help you with DSA today?
@@ -203,7 +188,6 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({
           </p>
         </div>
 
-        {/* Suggestion Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-6 w-full max-w-2xl">
           <button className="group p-4 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-left transition-all duration-200 border border-zinc-700 hover:border-zinc-600">
             <div className="flex items-start gap-3">

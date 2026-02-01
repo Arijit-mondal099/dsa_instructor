@@ -16,8 +16,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DSA Agent",
+  title: {
+    default: "Arijit Mondal DSA Agent",
+    template: "%s | Arijit Mondal DSA Agent",
+  },
   description: "My personal dsa agent.",
+  icons: "/favicon.png"
 };
 
 export default function RootLayout({

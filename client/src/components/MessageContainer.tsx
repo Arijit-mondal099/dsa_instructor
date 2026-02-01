@@ -12,17 +12,14 @@ interface MessageContainerProps {
   params: Promise<{ slug: string }>;
 }
 
-export const MessageContainer: React.FC<MessageContainerProps> = ({
-  params,
-}) => {
+export const MessageContainer: React.FC<MessageContainerProps> = ({ params }) => {
   const { slug } = use(params);
-  const { fetchMessageTabContent, selectTabContent, isLoading } =
-    useAppContext();
+  const { fetchMessageTabContent, selectTabContent, isLoading, accessToken } = useAppContext();
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    fetchMessageTabContent(slug);
-  }, [slug, fetchMessageTabContent]);
+    if (accessToken && slug) fetchMessageTabContent(slug);
+  }, [slug, fetchMessageTabContent, accessToken]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });

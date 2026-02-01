@@ -10,7 +10,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAppContext()
+  const { login } = useAppContext();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,9 +25,9 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-zinc-700 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md">
-        <div className="bg-gray-800 rounded-2xl shadow-xl border border-gray-700 p-8 space-y-8">
+        <div className="bg-zinc-800 rounded-2xl shadow-xl border border-zinc-900 p-8 space-y-8">
           {/* Header */}
           <div className="text-center">
             <h2 className="text-3xl font-bold text-white">Welcome back</h2>
@@ -98,7 +98,7 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 px-4 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center">
@@ -115,8 +115,7 @@ const LoginPage = () => {
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-600"></div>
               </div>
-              <div className="relative flex justify-center text-sm">
-              </div>
+              <div className="relative flex justify-center text-sm"></div>
             </div>
           </form>
 

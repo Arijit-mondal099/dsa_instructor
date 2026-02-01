@@ -30,9 +30,9 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-zinc-700 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md">
-        <div className="bg-gray-800 rounded-2xl shadow-xl border border-gray-700 p-8 space-y-8">
+        <div className="bg-zinc-800 rounded-2xl shadow-xl border border-zinc-900 p-8 space-y-8">
           {/* Header */}
           <div className="text-center">
             <h2 className="text-3xl font-bold text-white">Signup for free</h2>
@@ -124,7 +124,7 @@ const RegisterPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 px-4 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center">

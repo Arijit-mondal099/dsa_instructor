@@ -6,24 +6,24 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export const Sidebar = () => {
-  const { sidebarOpen, toggleSidebar, logout, getUserTabs, messageTabs, createNewChatTab, selectTabContent, activeTab, setActiveTab } = useAppContext();
+  const { sidebarOpen, toggleSidebar, logout, getUserTabs, messageTabs, createNewChatTab, selectTabContent, activeTab, setActiveTab, accessToken } = useAppContext();
   const router = useRouter();
 
   const handleCreateNewTab = () => {
-    if (selectTabContent.length && messageTabs[0].content.length) {
+    if (selectTabContent?.length && messageTabs[0]?.content.length) {
       createNewChatTab();
     } else {
-      router.push(`/chat/${messageTabs[0]._id}`);
-      setActiveTab(messageTabs[0]._id)
+      router.push(`/chat/${messageTabs[0]?._id}`);
+      setActiveTab(messageTabs[0]?._id);
     }
   }
 
   useEffect(() => {
-    getUserTabs();
-  }, [getUserTabs]);
+    if (accessToken) getUserTabs();
+  }, [getUserTabs, accessToken]);
 
   useEffect(() => {
-    if (messageTabs.length && !activeTab) setActiveTab(messageTabs[0]._id);
+    if (messageTabs.length && !activeTab) setActiveTab(messageTabs[0]?._id);
   }, [messageTabs, activeTab, setActiveTab]);
 
   return (
@@ -32,7 +32,7 @@ export const Sidebar = () => {
     >
       <div className="p-4 border-b border-zinc-800 flex items-center justify-between gap-4">
         <h1 className="text-xl font-bold ">DSA Agent</h1>
-        <button onClick={toggleSidebar} className="lg:hidden">
+        <button onClick={toggleSidebar} className="lg:hidden cursor-pointer">
           <PanelRightOpen className="w-6 h-6" />
         </button>
       </div>

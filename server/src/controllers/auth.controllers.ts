@@ -110,7 +110,20 @@ export const logout = asyncHandler(async (req, res) => {
     { new: true },
   );
 
-  return res.status(200).json(new ApiResponse(200, "User logout successfuly"));
+  const cookieOptions: CookieOptions = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 7,
+  };
+
+  return res
+    .clearCookie("accessToken", cookieOptions)
+    .clearCookie("refreshToken", cookieOptions)
+    .clearCookie("chat-id", cookieOptions)
+    .status(200)
+    .json(new ApiResponse(200, "User logout successfuly"));
 });
 
 export const refereshAccessToken = asyncHandler(async (req, res) => {

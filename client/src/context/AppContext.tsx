@@ -39,6 +39,7 @@ export function AppContextProvider({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
 
+  // ---------------------- Feature for create new msg tab -----------------
   const createNewChatTab = useCallback(async () => {
     try {
       const { data } = await axiosInstance.post<INewChatTabCreateResponse>(
@@ -69,6 +70,34 @@ export function AppContextProvider({
     }
   }, [accessToken, router]);
 
+  // ---------------------- Feature for fetch all user msg tab's -----------
+  const getUserTabs = useCallback(async (): Promise<void> => {
+    try {
+      const { data } = await axiosInstance.get<IMessageTabResponse>(
+        "/message",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+      if (data.success && data.data.tabs.length > 0) {
+        setMessageTabs(data.data.tabs);
+        setActiveTab(data.data.tabs[0]._id);
+      }
+    } catch (error: unknown) {
+      console.log(error)
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || "Failed fetch tabs");
+      } else if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Something went wrong");
+      }
+    }
+  }, [accessToken]);
+
+  // ---------------------- Feature for user login -------------------------
   const login = useCallback(
     async (payload: { email: string; password: string }): Promise<void> => {
       try {
@@ -77,19 +106,27 @@ export function AppContextProvider({
           payload,
         );
 
-        if (messageTabs.length === 0) {
-          createNewChatTab();
-        }
-
         if (data.success) {
           setAccessToken(data.data.accessToken);
           setRefreshToken(data.data.refreshToken);
           setUser(data.data.username);
           localStorage.setItem("accessToken", data.data.accessToken);
           localStorage.setItem("refreshToken", data.data.refreshToken);
-          toast.success(data.message);
+
+          await getUserTabs();
+
+          if (messageTabs && !messageTabs?.length) {
+            await createNewChatTab();
+            if (messageTabs[0]?._id) {
+              setActiveTab(messageTabs[0]._id);
+              router.replace(`/chat/${messageTabs[0]._id}`);
+            }
+          } else {
+            router.replace(`/chat/${messageTabs[0]?._id}`);
+          }
         }
       } catch (error: unknown) {
+        console.log(error)
         if (error instanceof AxiosError) {
           toast.error(error.response?.data?.message || "Login failed");
         } else if (error instanceof Error) {
@@ -99,9 +136,10 @@ export function AppContextProvider({
         }
       }
     },
-    [createNewChatTab, messageTabs],
+    [createNewChatTab, messageTabs, getUserTabs, router],
   );
 
+  // ---------------------- Feature for user register ----------------------
   const register = useCallback(
     async (payload: {
       username: string;
@@ -129,6 +167,7 @@ export function AppContextProvider({
     [],
   );
 
+  // ---------------------- Feature for user logout ------------------------
   const logout = useCallback(async (): Promise<void> => {
     try {
       const { data } = await axiosInstance.post<ILogoutResponse>(
@@ -146,8 +185,10 @@ export function AppContextProvider({
         setUser(null);
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
+        router.replace("/login");
       }
     } catch (error: unknown) {
+      console.log(error);
       if (error instanceof AxiosError) {
         toast.error(error.response?.data?.message || "Logout failed");
       } else if (error instanceof Error) {
@@ -156,33 +197,9 @@ export function AppContextProvider({
         toast.error("Something went wrong");
       }
     }
-  }, [accessToken]);
+  }, [accessToken, router]);
 
-  const getUserTabs = useCallback(async (): Promise<void> => {
-    try {
-      const { data } = await axiosInstance.get<IMessageTabResponse>(
-        "/message",
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      );
-      if (data.success) {
-        setMessageTabs(data.data.tabs);
-        setActiveTab(data.data.tabs[0]._id);
-      }
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.message || "Failed fetch tabs");
-      } else if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error("Something went wrong");
-      }
-    }
-  }, [accessToken]);
-
+  // ---------------------- Feature for fetch selected msg tab content -----
   const fetchMessageTabContent = useCallback(
     async (slug: string): Promise<void> => {
       try {
@@ -199,6 +216,7 @@ export function AppContextProvider({
           setSelectTabContent(data.data.content);
         }
       } catch (error) {
+        console.log(error)
         if (error instanceof AxiosError) {
           toast.error(
             error.response?.data?.message || "Failed fetch tab content",
@@ -213,6 +231,7 @@ export function AppContextProvider({
     [accessToken],
   );
 
+  // ---------------------- Feature for sent prompt to LLM -----------------
   const sentMessageToAI = useCallback(
     async (prompt: string) => {
       setIsLoading(true);

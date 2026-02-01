@@ -4,6 +4,7 @@ import { ApiError } from "../utils/api_error";
 import { asyncHandler } from "../utils/async_handler";
 import { ApiResponse } from "../utils/api_response";
 import { LLM } from "../config/gemini";
+import { CookieOptions } from "express";
 
 export const createNewMessageTab = asyncHandler(async (req, res) => {
   const userId = req.user.id;
@@ -18,7 +19,16 @@ export const createNewMessageTab = asyncHandler(async (req, res) => {
     content: [],
   });
 
+  const cookieOptions: CookieOptions = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 7,
+  };
+
   return res
+    .cookie("chat-id", String(newTab._id), cookieOptions)
     .status(201)
     .json(new ApiResponse(201, "Tab created successfully", { tab: newTab }));
 });
@@ -34,7 +44,16 @@ export const getUserTabs = asyncHandler(async (req, res) => {
     { createdAt: -1 },
   );
 
+  const cookieOptions: CookieOptions = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 7,
+  };
+
   return res
+    .cookie("chat-id", String(tabs && tabs[0]?._id), cookieOptions)
     .status(200)
     .json(new ApiResponse(200, "Tabs fetched successfully", { tabs }));
 });

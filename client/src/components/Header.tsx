@@ -8,7 +8,7 @@ export const Header = () => {
 
   return (
     <div className="flex items-center gap-4 lg:hidden py-4 px-4">
-      <button onClick={toggleSidebar}>
+      <button onClick={toggleSidebar} className="cursor-pointer">
         <PanelRightClose className="w-6 h-6" />
       </button>
       <h1 className="text-lg font-bold">DSA Agent</h1>

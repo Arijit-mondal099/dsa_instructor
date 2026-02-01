@@ -16,7 +16,8 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({
   params,
 }) => {
   const { slug } = use(params);
-  const { fetchMessageTabContent, selectTabContent } = useAppContext();
+  const { fetchMessageTabContent, selectTabContent, isLoading } =
+    useAppContext();
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -53,7 +54,6 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({
               />
             </div>
 
-            {/* ✅ FIXED: missing div */}
             <div className="flex flex-col gap-2 max-w-[80%]">
               <div className="py-3 px-4 rounded-3xl bg-zinc-800 text-gray-100 prose prose-invert prose-sm max-w-none">
                 <ReactMarkdown
@@ -137,6 +137,44 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({
             </div>
           </div>
         ),
+      )}
+
+      {isLoading && (
+        <div className="flex gap-4">
+          <div className="w-8 h-8 rounded-full shrink-0 overflow-hidden ring-2 ring-emerald-500 ring-offset-2 ring-offset-zinc-900 animate-pulse">
+            <Image
+              src="/ai_image.jpg"
+              className="w-full h-full object-cover"
+              alt="ai-image"
+              width={100}
+              height={100}
+            />
+          </div>
+          <div className="flex flex-col gap-2 max-w-[80%]">
+            <div className="py-4 px-5 rounded-3xl bg-zinc-800 text-gray-100">
+              {/* Typing indicator */}
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-1.5">
+                    <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                    <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                    <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-bounce"></span>
+                  </div>
+                  <span className="text-sm text-gray-400 font-medium">
+                    Generating response...
+                  </span>
+                </div>
+
+                {/* Shimmer lines */}
+                <div className="space-y-2">
+                  <div className="h-2 bg-zinc-700 rounded-full w-full animate-pulse"></div>
+                  <div className="h-2 bg-zinc-700 rounded-full w-5/6 animate-pulse [animation-delay:0.2s]"></div>
+                  <div className="h-2 bg-zinc-700 rounded-full w-4/6 animate-pulse [animation-delay:0.4s]"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       <div ref={bottomRef} />

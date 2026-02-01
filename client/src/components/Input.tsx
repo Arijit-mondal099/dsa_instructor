@@ -1,12 +1,13 @@
 "use client";
 
+import { useAppContext } from "@/context/AppContext";
 import { useState, useRef, useEffect } from "react";
 
 export const Input = () => {
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { sentMessageToAI } = useAppContext();
 
-  // Auto-resize textarea as user types
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
@@ -17,7 +18,7 @@ export const Input = () => {
 
   const handleSend = () => {
     if (message.trim()) {
-      console.log("Sending message:", message);
+      sentMessageToAI(message);
       setMessage("");
     }
   };

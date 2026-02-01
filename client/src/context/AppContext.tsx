@@ -2,6 +2,7 @@
 
 import { axiosInstance } from "@/lib/axios";
 import {
+  AIGenResponse,
   IAppContext,
   IContent,
   ILoginResponse,
@@ -35,6 +36,7 @@ export function AppContextProvider({
   const [messageTabs, setMessageTabs] = useState<ITab[]>([]);
   const [selectTabContent, setSelectTabContent] = useState<IContent[]>([]);
   const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
 
   const login = useCallback(
@@ -93,65 +95,59 @@ export function AppContextProvider({
     [],
   );
 
-  const logout = useCallback(
-    async (): Promise<void> => {
-      try {
-        const { data } = await axiosInstance.post<ILogoutResponse>(
-          "/auth/logout",
-          null,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
+  const logout = useCallback(async (): Promise<void> => {
+    try {
+      const { data } = await axiosInstance.post<ILogoutResponse>(
+        "/auth/logout",
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
           },
-        );
-        if (data.success) {
-          setAccessToken(null);
-          setRefreshToken(null);
-          setUser(null);
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
-        }
-      } catch (error: unknown) {
-        if (error instanceof AxiosError) {
-          toast.error(error.response?.data?.message || "Logout failed");
-        } else if (error instanceof Error) {
-          toast.error(error.message);
-        } else {
-          toast.error("Something went wrong");
-        }
+        },
+      );
+      if (data.success) {
+        setAccessToken(null);
+        setRefreshToken(null);
+        setUser(null);
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
       }
-    }, 
-    [accessToken]
-  );
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || "Logout failed");
+      } else if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Something went wrong");
+      }
+    }
+  }, [accessToken]);
 
-  const getUserTabs = useCallback(
-    async (): Promise<void> => {
-      try {
-        const { data } = await axiosInstance.get<IMessageTabResponse>(
-          "/message",
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
+  const getUserTabs = useCallback(async (): Promise<void> => {
+    try {
+      const { data } = await axiosInstance.get<IMessageTabResponse>(
+        "/message",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
           },
-        );
-        if (data.success) {
-          setMessageTabs(data.data.tabs);
-          setActiveTab(data.data.tabs[0]._id);
-        }
-      } catch (error: unknown) {
-        if (error instanceof AxiosError) {
-          toast.error(error.response?.data?.message || "Failed fetch tabs");
-        } else if (error instanceof Error) {
-          toast.error(error.message);
-        } else {
-          toast.error("Something went wrong");
-        }
+        },
+      );
+      if (data.success) {
+        setMessageTabs(data.data.tabs);
+        setActiveTab(data.data.tabs[0]._id);
       }
-    }, 
-    [accessToken]
-  );
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || "Failed fetch tabs");
+      } else if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Something went wrong");
+      }
+    }
+  }, [accessToken]);
 
   const fetchMessageTabContent = useCallback(
     async (slug: string): Promise<void> => {
@@ -183,28 +179,63 @@ export function AppContextProvider({
     [accessToken],
   );
 
-  const createNewChatTab = useCallback(
-    async () => {
+  const createNewChatTab = useCallback(async () => {
+    try {
+      const { data } = await axiosInstance.post<INewChatTabCreateResponse>(
+        "/message",
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      if (data.success) {
+        setMessageTabs((prev) => [data.data.tab, ...prev]);
+        setActiveTab(data.data.tab._id);
+        router.push(`/chat/${data.data.tab._id}`);
+      }
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(
+          error.response?.data?.message || "Failed fetch tab content",
+        );
+      } else if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Something went wrong");
+      }
+    }
+  }, [accessToken, router]);
+
+  const sentMessageToAI = useCallback(
+    async (prompt: string) => {
+      setIsLoading(true);
+      setSelectTabContent((prev) => [
+        ...prev,
+        { _id: Date.now().toString(), role: "user", text: prompt },
+      ]);
+
       try {
-        const { data } = await axiosInstance.post<INewChatTabCreateResponse>(
-          "/message", 
-          null,
+        const { data } = await axiosInstance.patch<AIGenResponse>(
+          `/message/${activeTab}`,
+          { prompt },
           {
             headers: {
-              Authorization: `Bearer ${accessToken}`
-            }
-          }
+              Authorization: `Bearer ${accessToken}`,
+            },
+          },
         );
 
         if (data.success) {
-          setMessageTabs((prev) => [data.data.tab, ...prev]);
-          setActiveTab(data.data.tab._id);
-          router.push(`/chat/${data.data.tab._id}`);
+          setIsLoading(false);
+          setSelectTabContent((prev) => [...prev, { _id: Date.now().toString(), ...data.data}]);
         }
       } catch (error: unknown) {
         if (error instanceof AxiosError) {
           toast.error(
-            error.response?.data?.message || "Failed fetch tab content",
+            error.response?.data?.message || "Oops please try again!",
           );
         } else if (error instanceof Error) {
           toast.error(error.message);
@@ -213,8 +244,8 @@ export function AppContextProvider({
         }
       }
     },
-    [accessToken, router]
-  )
+    [accessToken, activeTab],
+  );
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
@@ -227,7 +258,8 @@ export function AppContextProvider({
         sidebarOpen,
         messageTabs,
         selectTabContent,
-        activeTab, 
+        activeTab,
+        isLoading,
         setActiveTab,
         fetchMessageTabContent,
         toggleSidebar,
@@ -235,7 +267,8 @@ export function AppContextProvider({
         register,
         logout,
         getUserTabs,
-        createNewChatTab
+        createNewChatTab,
+        sentMessageToAI,
       }}
     >
       {children}

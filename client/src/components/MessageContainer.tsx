@@ -145,7 +145,7 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({ params }) =>
                     <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-bounce"></span>
                   </div>
                   <span className="text-sm text-gray-400 font-medium">
-                    Generating response...
+                    Thinking...
                   </span>
                 </div>
 

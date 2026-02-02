@@ -14,23 +14,16 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     const isChatRoot = currentPath === "/" || currentPath === "/chat";
     const isChatRoute = currentPath.startsWith("/chat/");
 
-    const storedToken = localStorage.getItem("accessToken");
-    const token = accessToken || storedToken;
+    if (!accessToken && (isChatRoot || isChatRoute)) {
+      return router.push("/login");
+    }
 
-    if (!token && (isChatRoot || isChatRoute)) {
-      router.push("/login");
-    } 
-    
-    else if (token && isAuthRoute) {
-      if (chatId) {
-        router.push(`/chat/${chatId}`);
-      } else {
-        router.push("/chat");
-      }
-    } 
-    
-    else if (token && chatId && isChatRoot) {
-      router.push(`/chat/${chatId}`);
+    if (accessToken && isAuthRoute && chatId) {
+      return router.push(`/chat/${chatId}`);
+    }
+
+    if (accessToken && chatId && isChatRoot) {
+      return router.push(`/chat/${chatId}`);
     }
   }, [accessToken, router, chatId]);
 

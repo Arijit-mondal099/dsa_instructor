@@ -113,29 +113,15 @@ export function AppContextProvider({
         );
 
         if (data.success) {
+          await getUserTabs(); // fetch user tabs
+          
           setAccessToken(data.data.accessToken);
           setRefreshToken(data.data.refreshToken);
           localStorage.setItem("accessToken", data.data.accessToken);
           localStorage.setItem("refreshToken", data.data.refreshToken);
 
-          const tabs = await axiosInstance.get<IMessageTabResponse>(
-            "/message",
-            { 
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-              },
-            },
-          );
-
-          if (tabs.data.data.tabs && tabs.data.data.tabs?.length === 0) {
-            await createNewChatTab();
-            if (tabs.data.data.tabs[0]?._id) {
-              setActiveTab(tabs.data.data.tabs[0]._id);
-              router.replace(`/chat/${tabs.data.data.tabs[0]._id}`);
-            }
-          } else {
-            router.replace(`/chat/${tabs.data.data.tabs[0]?._id}`);
-          }
+          if (messageTabs.length > 0) router.replace(`/chat/${messageTabs[0]?._id}`);
+          else await createNewChatTab();
         }
       } catch (error: unknown) {
         console.log(error);
@@ -148,7 +134,7 @@ export function AppContextProvider({
         }
       }
     },
-    [createNewChatTab, router, accessToken],
+    [createNewChatTab, router, getUserTabs, messageTabs],
   );
 
   // ---------------------- Feature for user register ----------------------

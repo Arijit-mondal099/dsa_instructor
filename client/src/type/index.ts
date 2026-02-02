@@ -1,5 +1,4 @@
 export interface IAppContext {
-  user: string | null;
   accessToken: string | null;
   refreshToken: string | null;
   sidebarOpen: boolean;
@@ -7,6 +6,7 @@ export interface IAppContext {
   selectTabContent: IContent[];
   activeTab: string | null;
   isLoading: boolean;
+  chatId: string | null;
   setActiveTab: React.Dispatch<React.SetStateAction<string | null>>;
   login: (payload: { email: string; password: string }) => Promise<void>;
   register: (payload: {

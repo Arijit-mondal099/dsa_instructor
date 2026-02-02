@@ -25,7 +25,6 @@ export function AppContextProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [user, setUser] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(() =>
     typeof window !== "undefined" ? localStorage.getItem("accessToken") : null,
   );
@@ -36,6 +35,9 @@ export function AppContextProvider({
   const [messageTabs, setMessageTabs] = useState<ITab[]>([]);
   const [selectTabContent, setSelectTabContent] = useState<IContent[]>([]);
   const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [chatId, setChatId] = useState<string | null>(() =>
+    typeof window !== "undefined" ? localStorage.getItem("chat-id") : null,
+  );
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
 
@@ -53,6 +55,8 @@ export function AppContextProvider({
       );
 
       if (data.success) {
+        localStorage.setItem("chat-id", data.data.tab._id);
+        setChatId(data.data.tab._id);
         setMessageTabs((prev) => [data.data.tab, ...prev]);
         setActiveTab(data.data.tab._id);
         router.push(`/chat/${data.data.tab._id}`);
@@ -82,11 +86,13 @@ export function AppContextProvider({
         },
       );
       if (data.success && data.data.tabs.length > 0) {
+        localStorage.setItem("chat-id", data.data.tabs[0]._id);
+        setChatId(data.data.tabs[0]._id);
         setMessageTabs(data.data.tabs);
         setActiveTab(data.data.tabs[0]._id);
       }
     } catch (error: unknown) {
-      console.log(error)
+      console.log(error);
       if (error instanceof AxiosError) {
         toast.error(error.response?.data?.message || "Failed fetch tabs");
       } else if (error instanceof Error) {
@@ -109,13 +115,12 @@ export function AppContextProvider({
         if (data.success) {
           setAccessToken(data.data.accessToken);
           setRefreshToken(data.data.refreshToken);
-          setUser(data.data.username);
           localStorage.setItem("accessToken", data.data.accessToken);
           localStorage.setItem("refreshToken", data.data.refreshToken);
 
           await getUserTabs();
 
-          if (messageTabs && !messageTabs?.length) {
+          if (messageTabs && messageTabs?.length === 0) {
             await createNewChatTab();
             if (messageTabs[0]?._id) {
               setActiveTab(messageTabs[0]._id);
@@ -126,7 +131,7 @@ export function AppContextProvider({
           }
         }
       } catch (error: unknown) {
-        console.log(error)
+        console.log(error);
         if (error instanceof AxiosError) {
           toast.error(error.response?.data?.message || "Login failed");
         } else if (error instanceof Error) {
@@ -182,9 +187,9 @@ export function AppContextProvider({
       if (data.success) {
         setAccessToken(null);
         setRefreshToken(null);
-        setUser(null);
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
+        localStorage.removeItem("chat-id");
         router.replace("/login");
       }
     } catch (error: unknown) {
@@ -216,7 +221,7 @@ export function AppContextProvider({
           setSelectTabContent(data.data.content);
         }
       } catch (error) {
-        console.log(error)
+        console.log(error);
         if (error instanceof AxiosError) {
           toast.error(
             error.response?.data?.message || "Failed fetch tab content",
@@ -278,7 +283,6 @@ export function AppContextProvider({
   return (
     <AuthContext.Provider
       value={{
-        user,
         accessToken,
         refreshToken,
         sidebarOpen,
@@ -286,6 +290,7 @@ export function AppContextProvider({
         selectTabContent,
         activeTab,
         isLoading,
+        chatId,
         setActiveTab,
         fetchMessageTabContent,
         toggleSidebar,

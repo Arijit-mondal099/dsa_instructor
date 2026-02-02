@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { AppContextProvider } from "@/context/AppContext";
 import { Toaster } from "sonner";
 import "./globals.css";
+import { AuthGuard } from "@/components/AuthGuard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
     template: "%s | Arijit Mondal DSA Agent",
   },
   description: "My personal dsa agent.",
-  icons: "/favicon.png"
+  icons: "/favicon.png",
 };
 
 export default function RootLayout({
@@ -34,8 +35,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}
       >
         <AppContextProvider>
+          <AuthGuard>
             {children}
             <Toaster />
+          </AuthGuard>
         </AppContextProvider>
       </body>
     </html>

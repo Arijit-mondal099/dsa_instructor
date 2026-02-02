@@ -14,7 +14,9 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 app.use(
   cors({
-    origin: ENV.NODE_ENV === "dev" ? ["http://localhost:3000", "http://localhost:5173"] : ENV.CORS_ORIGIN,
+    origin: ENV.NODE_ENV === "development" 
+      ? ["http://localhost:3000", "http://localhost:5173"] 
+      : [ENV.CORS_ORIGIN],
     credentials: true,
   }),
 );

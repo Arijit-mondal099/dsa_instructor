@@ -36,9 +36,7 @@ dsa_instructor/
 3. Create `.env` file:
 
    ```env
-   PORT=5000
-   NODE_ENV=development
-   DATABASE_URL=your_database_url
+   env.example
    ```
 
 4. Start development server:
@@ -70,7 +68,9 @@ dsa_instructor/
 3. Create `.env` file:
 
    ```env
-   REACT_APP_API_URL=http://localhost:5000
+   NEXT_PUBLIC_NODE_ENV=development
+   NEXT_PUBLIC_API_URL=http://localhost:3000
+
    ```
 
 4. Start development:
@@ -86,22 +86,26 @@ dsa_instructor/
 
 ## API Documentation
 
-Server runs on `http://localhost:5000`
+Server runs on `http://localhost:4040`
 
-Key endpoints:
+| No | Name           | Total |
+|----|----------------|-------|
+| 1  | Authentication |   5   |
+| 2  | Users API      |   4   |
+| 3  | Helth          |   1   |
 
-- `GET /api/problems` - List all DSA problems
-- `POST /api/solutions` - Submit solution
+- auth: http://localhost:4040/api/v1/auth
+- message: http://localhost:4040/api/v1/message
 
 ## Deployment
 
-### Server (Heroku/Railway/Vercel)
+### Server
 
 ```bash
 npm run build
 ```
 
-### Client (Vercel/Netlify)
+### Client
 
 ```bash
 npm run build

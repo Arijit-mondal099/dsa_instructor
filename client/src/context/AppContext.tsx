@@ -184,6 +184,13 @@ export function AppContextProvider({
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("chat-id");
         router.replace("/login");
+      } else {
+        setAccessToken(null);
+        setRefreshToken(null);
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("chat-id");
+        router.replace("/login");
       }
     } catch (error: unknown) {
       console.log(error);
@@ -194,6 +201,13 @@ export function AppContextProvider({
       } else {
         toast.error("Something went wrong");
       }
+
+      setAccessToken(null);
+      setRefreshToken(null);
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("chat-id");
+      router.replace("/login");
     }
   }, [accessToken, router]);
 
@@ -307,3 +321,4 @@ export function useAppContext() {
   }
   return context;
 }
+

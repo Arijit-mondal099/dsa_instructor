@@ -177,31 +177,15 @@ export function AppContextProvider({
           },
         },
       );
-      if (data.success) {
-        setAccessToken(null);
-        setRefreshToken(null);
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("chat-id");
-        router.replace("/login");
-      } else {
-        setAccessToken(null);
-        setRefreshToken(null);
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("chat-id");
-        router.replace("/login");
-      }
-    } catch (error: unknown) {
-      console.log(error);
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.message || "Logout failed");
-      } else if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error("Something went wrong");
-      }
 
+      // if user want to logout then logout user on both case success or not success
+      setAccessToken(null);
+      setRefreshToken(null);
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("chat-id");
+      router.replace("/login");
+    } catch (error: unknown) {
       setAccessToken(null);
       setRefreshToken(null);
       localStorage.removeItem("accessToken");
@@ -321,4 +305,5 @@ export function useAppContext() {
   }
   return context;
 }
+
 
